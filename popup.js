@@ -129,7 +129,7 @@ var _SHIFT_MAP = {
 };
 //addition of function keys to map
 for (var i = 1; i < 20; ++i) {
-    _MAP[111 + i] = 'f' + i;
+    _MAP[111 + i] = 'F' + i;
 } 
 //addition of numkeys to map
 for (i = 0; i <= 9; ++i) {
@@ -505,7 +505,7 @@ function saveData(input){
                         if(temp>=48&&temp<=57) flag =1;
                         if(temp>=186&&temp<=192) flag =1;
                         if(temp>=106&&temp<=111) flag =1;
-                        if(temp>=219&&temp<=221) flag =1;
+                        if(temp>=219&&temp<=221||temp==32) flag =1;
                         if(flag==1){
                         var currentcharobj = {'key':currentchar, 'keyCode' :currentcharKeyCode, 'shift' : shift, 'ctrl' : ctrl,'alt' :alt };
                         }
