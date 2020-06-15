@@ -1,0 +1,29 @@
+{
+	"ctrl, a": [
+		["Send", "ctrl", "a", "space", "b", "c", "d", "shift"],["Sleep",100],
+		["select_goalcategory","Alexa"],
+		["Send","a","b","c","d"]
+        ],
+
+	"b , c": [
+		["Send","G","x","y"],
+		["Sleep",200]
+	],
+
+   "f2 , t" : [["select_goalcategory","ASK - Others"],
+               ["Send","a","b","down","2"],
+              ["select_discard","Blank NLU"],
+              ["Send","x","down","c","7"]
+             
+            
+            ],
+
+
+
+   " numpadleft, y" :[
+	   ["Send","a","b","d"],
+	   ["Sleep","1000"],
+	   ["Send","x","y","z"]
+   ]
+
+}
