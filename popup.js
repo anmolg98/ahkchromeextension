@@ -1,69 +1,28 @@
 $(function(){
-
-   chrome.storage.local.get('@#',function(data){
+  chrome.storage.local.get('@#',function(data){
     if(data['@#']){
         var y = data['@#'];
         document.getElementById("abc").innerHTML=y;
     }
-   })
+});
+    chrome.storage.local.get('@$',function(data){
+        if(data['@$']){
+            var y = data['@$'];
+            document.getElementById("locale").innerHTML=y;
+        }
+   });
     
-$("button").on('click',refreshWorkflow);
+$("button").on('click',refreshWorkFlow);
 });
 
-
-
-function refreshWorkflow(event){
-    document.getElementById("abc").innerHTML="Current Active : " + event.target.id;
-    console.log('event',event.target.id);
-    var x = $("#abc");
-    console.log(x.innerHTML);
+function refreshWorkFlow(event){
     chrome.storage.local.clear();
-
-    var html = "Current Active : " + event.target.id;
-    chrome.storage.local.set({"@#":html});
-     var fname =event.target.id + "_expander.json"; 
-      var xhr = new XMLHttpRequest();
-       xhr.onreadystatechange =function ()
-    {
-        if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200)
-        {
-                    var shortcuts=xhr.responseText;
-                    setTimeout(function (){
-                      console.log(shortcuts);
-                      shortcuts = JSON.parse(shortcuts);
-                      chrome.storage.local.set(shortcuts);
-                      chrome.storage.local.get(null,function(data){
-                          console.log(data);
-                      });
-
-                    },100);
-                    console.log("xyz");
-                
-        }
-       };
-       xhr.open("GET", chrome.extension.getURL(fname),true);
-    xhr.send();
-    
-    fname =event.target.id + "_shortcuts.json"; 
-    var xhr1 = new XMLHttpRequest();
-    xhr1.onreadystatechange =function ()
-    {
-        if(xhr1.readyState == XMLHttpRequest.DONE && xhr1.status == 200)
-        {
-                    var shortcuts=xhr1.responseText;
-                    setTimeout(function (){
-                      console.log(shortcuts);
-                      input = JSON.parse(shortcuts);
-                      saveData(input);
-
-                    },100);
-                    
-                
-        }
-    };
-    xhr1.open("GET", chrome.extension.getURL(fname),true);
-    
-    xhr1.send();
+    refreshCurrentActive(event);
+    refreshCurrentLocale(event);
+    var fname ="/jsons/"+event.target.id + "/expander.json"; 
+    setStorage(fname,setSnippets);
+    fname ="/jsons/" + event.target.id + "/shortcuts.json";
+    setStorage(fname,setShortcuts); 
 }
 var _MAP = {
     8: 'backspace',
@@ -351,7 +310,7 @@ function toArrayofParagraphs(ArrayofLines){
                if(ArrayofLines[i].length>1){
                
               currentParagraph.push(ArrayofLines[i]);
-              console.log(i,'y',currentParagraph,ArrayofLines[i].length);
+              //console.log(i,'y',currentParagraph,ArrayofLines[i].length);
               console.log(currentParagraph);
            }
            else{
@@ -472,7 +431,7 @@ function Instruction_parse(InstructionString){
    else return;
 }
 
-function saveData(input){
+function setShortcuts(input){
      var output = {};
     for(key in input){
         if(input.hasOwnProperty(key)){
@@ -493,7 +452,7 @@ function saveData(input){
                         var currentchar = currentInstructionArray[pos];
                         if(currentchar=="shiftdown") {shift=true;currentchar="shift"}
                         if(currentchar=="ctrldown") {ctrl=true;currentchar="ctrl"}
-                        if(currentchar=="alttdown") {alt=true;currentchar="alt"}
+                        if(currentchar=="altdown") {alt=true;currentchar="alt"}
                         if(currentchar=="shiftup") {shift=false;continue;}
                         if(currentchar=="ctrlup") {ctrl=false;continue}
                         if(currentchar=="altup") {alt=false;continue;}
@@ -565,4 +524,50 @@ function saveData(input){
     }
     console.log(input,output);
     chrome.storage.local.set(output);
+    }
+    function setSnippets(input){
+             for(key in input){
+                 var prefixedSnippet = '@' + key;
+                 var obj={};
+                 obj[prefixedSnippet] = input[key];
+                 chrome.storage.local.set(obj);
+             }
+    }
+    function setStorage(filename,type){
+    var xhr = new XMLHttpRequest();
+       xhr.onreadystatechange =function (){
+        if(xhr.readyState == XMLHttpRequest.DONE && xhr.status == 200){
+                    var shortcuts=xhr.responseText;
+                setTimeout(function (){
+                    console.log(shortcuts);
+                    shortcuts = JSON.parse(shortcuts);
+                    type(shortcuts);
+                },100);
+                    }
+       };
+       xhr.open("GET", chrome.extension.getURL(filename),true);
+       xhr.send();
+    }
+    function refreshCurrentActive(event){
+        document.getElementById("abc").innerHTML="Current Active : " + event.target.id;
+    console.log('event',event.target.id);
+    var x = $("#abc");
+    console.log(x.innerHTML);
+    
+
+    var html = "Current Active : " + event.target.id;
+    chrome.storage.local.set({"@#":html});
+    }
+    function refreshCurrentLocale(event){
+        var index = document.getElementById("localelist").selectedIndex;
+        var selectedElement = document.getElementById("localelist").options[index].innerHTML;
+        console.log(selectedElement,document.getElementById('localelist'),'abc');
+        var html = "Active Locale : " + selectedElement;
+        document.getElementById("locale").innerHTML=html;
+        chrome.storage.local.set({"@$":html});
+        var fname ="/jsons/"+event.target.id +"/" + selectedElement + "/expander.json";
+        console.log(fname);
+        setStorage(fname,setSnippets); 
+        fname ="/jsons/"+event.target.id +"/" + selectedElement + "/shortcuts.json";
+        setStorage(fname,setShortcuts); 
     }

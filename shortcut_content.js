@@ -1,78 +1,79 @@
-var CurrentPressed = [];
-var PressedKeysCount = 0;
-var PressedKeyTrack= new Map();
+var currentPressed = [];
+var pressedKeysCount = 0;
+var pressedKeyTrack= new Map();
 var currentInstructions;
 
-function PressKey(keyCode,key,shiftkey,ctrlkey){
-         console.log('pressss',key)
-        var CurrentEventD= createmyKey('keydown',keyCode,key,shiftkey,ctrlkey);
-        var CurrentEventP= createmyKey('keypress',keyCode,key,shiftkey,ctrlkey);
-        var CurrentEventU= createmyKey('keyup',keyCode,key,shiftkey,ctrlkey);
-       
+function pressKey(keyCode,key,shiftkey,ctrlkey,altkey){
+        var currentEventD= createmyKey('keydown',keyCode,key,shiftkey,ctrlkey,altkey);
+        var currentEventP= createmyKey('keypress',keyCode,key,shiftkey,ctrlkey,altkey);
+        var currentEventU= createmyKey('keyup',keyCode,key,shiftkey,ctrlkey,altkey);
+       console.log(currentEventD);
         //handling tab changes
-        if(CurrentEventD.keyCode==9 && CurrentEventD.shiftKey==true){
-            console.log('inside this');
-            $.focusPrev();
+        if(currentEventD.keyCode==9 && currentEventD.shiftKey==true){
+            
+            $.tabPrev();
         }
-        else if(CurrentEventD.keyCode==9 && CurrentEventD.shiftKey==false){
-            console.log('inside this');
-            $.focusNext();
+        else if(currentEventD.keyCode==9 && currentEventD.shiftKey==false){
+            
+            $.tabNext();
         }
         // event handling for text area
-        else if(document.activeElement.tagName=='TEXTAREA'||document.activeElement.tagName=='INPUT'){
-            var pressedkey=CurrentEventD.key;
+        
+         else{
+            console.log(currentEventD,currentEventP,currentEventU);
+        document.activeElement.dispatchEvent(currentEventD);
+        document.activeElement.dispatchEvent(currentEventP);
+        document.activeElement.dispatchEvent(currentEventU);
+        if(document.activeElement.tagName=='TEXTAREA'||document.activeElement.tagName=='INPUT'){
+            var pressedkey=currentEventD.key;
             console.log(pressedkey);
             var box=document.activeElement;
            var cursorposition=box.selectionStart;
+           if(currentEventD.altKey==0&&currentEventD.ctrlKey==0&&currentEventD.shiftKey==0){
             document.activeElement.value=[(box.value).slice(0, cursorposition),
                pressedkey, (box.value).slice(cursorposition)].join('');
+            }
         }
-        
-        
-        else{
-            console.log(CurrentEventD,CurrentEventP,CurrentEventU);
-        document.activeElement.dispatchEvent(CurrentEventD);
-        document.activeElement.dispatchEvent(CurrentEventP);
-        document.activeElement.dispatchEvent(CurrentEventU);
         }
 
 }
-function createmyKey(eventtype , keyCode,key,shiftkey,ctrlkey){
-    var keyevent = new KeyboardEvent(eventtype,{"bubbles" : true, "keyCode" : keyCode,"ctrlKey":ctrlkey,"key":key,"shiftKey":shiftkey});
+function createmyKey(eventtype , keyCode,key,shiftkey,ctrlkey,altkey){
+    var keyevent = new KeyboardEvent(eventtype,{"bubbles" : true, "keyCode" : keyCode,"ctrlKey":ctrlkey,"key":key,"shiftKey":shiftkey,"altKey":altkey});
     return keyevent;
 }
-function KeydownHandler(event){
-    console.log('keydown',event);
-    console.log('keydown',PressedKeysCount,PressedKeyTrack.size);
-    var PressedKey= event.which;
-    if( ! (PressedKeyTrack.has(PressedKey)) ){
-        if(CurrentPressed.length==PressedKeysCount){
-        PressedKeyTrack.set(PressedKey,1);
-        PressedKeysCount++;
-        console.log(PressedKeysCount);
-        CurrentPressed.push(PressedKey);
-        var CurrentString=CurrentPressed.join("+");
-        CheckShortcut(CurrentString,event.target);
+function keydownHandler(event){
+    console.log('keydown',event.cancelable);
+    if(event.cancelable==false) return;
+    console.log('crossed');
+    var pressKey= event.which;
+    console.log(event,'event');
+    if( ! (pressedKeyTrack.has(pressKey)) ){
+        if(currentPressed.length==pressedKeysCount){
+        pressedKeyTrack.set(pressKey,1);
+        pressedKeysCount++;
+        console.log(pressedKeysCount);
+        currentPressed.push(pressKey);
+        var currentString=currentPressed.join("+");
+        checkShortcut(currentString,event.target);
         }
     }
    
 }
-function KeyupHandler(event){
+function keyupHandler(event){
+    if(event.cancelable==false) return;
     console.log('keyup');
-    var ReleasedKey = event.which;
-    PressedKeyTrack.delete(ReleasedKey);
-    PressedKeysCount=0;
-    CurrentPressed.length=0;
+    var releasedKey = event.which;
+    pressedKeyTrack.delete(releasedKey);
+    pressedKeysCount=0;
+    currentPressed.length=0;
 
 }
 
-function CheckShortcut(shortcut,box){
-    console.log('check_shortcut',shortcut);
+function checkShortcut(shortcut,box){
 
-    chrome.storage.local.get(shortcut,function(data){
-        console.log(data,data[shortcut],shortcut);
+      chrome.storage.local.get(shortcut,function(data){
+        console.log(data,data[shortcut],shortcut,'short');
         if(data[shortcut]){
-            //chrome.runtime.sendMessage({'Instruct':data[shortcut]});
             currentInstructions=data[shortcut];
             if(box.nodeName=='TEXTAREA'){
                 var chars= calculatechars(shortcut);
@@ -82,53 +83,51 @@ function CheckShortcut(shortcut,box){
 
             }
             
-            ExecuteSet(data[shortcut],0);
+            executeSet(data[shortcut],0);
             
             
         }
     });
 }
-function ExecuteSet(Instructions,start){
-    var InstructionNumber=start;
-    var size = Instructions.length;
-    while(InstructionNumber<size){
+function executeSet(instructions,start){
+    var instructionNumber=start;
+    var size = instructions.length;
+    while(instructionNumber<size){
         var state=0;
        
-        for(x in Instructions[InstructionNumber]){
+        for(x in instructions[instructionNumber]){
             x=x.toLowerCase();
             if(x=='send'){
                 
-                nextInstructionNumber=InstructionNumber+1;
+                nextInstructionNumber=instructionNumber+1;
 
                 if(nextInstructionNumber<size){
-                    var nextInstruction= Instructions[nextInstructionNumber];
+                    var nextInstruction= instructions[nextInstructionNumber];
                     var nextInstructionKey=Object.keys(nextInstruction);
                     if(nextInstructionKey=='sleep') state=1;
                 }
-                ExecuteSend(Instructions[InstructionNumber][x],state,InstructionNumber,Instructions);
+                executeSend(instructions[instructionNumber][x],state,instructionNumber,instructions);
                 if(state==1) break;
             }
             else if(x=='sleep'){
-                sleep(Instructions[InstructionNumber][x]);
+                sleep(instructions[instructionNumber][x]);
             }
             else if(x=='click'){
-                nextInstructionNumber=InstructionNumber+1;
+                nextInstructionNumber=instructionNumber+1;
 
                 if(nextInstructionNumber<size){
-                    var nextInstruction= Instructions[nextInstructionNumber];
+                    var nextInstruction= instructions[nextInstructionNumber];
                     var nextInstructionKey=Object.keys(nextInstruction);
                     if(nextInstructionKey=='sleep') state=1;
                 }
-                ExecuteClick(Instructions[InstructionNumber][x],state,InstructionNumber,Instructions);
+                executeClick(instructions[instructionNumber][x],state,instructionNumber,instructions);
                 if(state==1) break;
             }
             else if(x=='select_goalcategory'){
-                var choice=Instructions[InstructionNumber][x];
+                var choice=instructions[instructionNumber][x];
                var dropdownClass= document.getElementsByClassName('goalCategorySelect');
-                 console.log('dropdownClass',dropdownClass);
                if(dropdownClass){
                    dropdownElement=dropdownClass[1];
-                 console.log('dropdownElement',dropdownElement);
                    if(dropdownElement){
                        var dropdownList =  dropdownElement.options;
                        var index=0;
@@ -144,7 +143,7 @@ function ExecuteSet(Instructions,start){
                }
             }
             else if(x=='select_discard'){
-                var choice=Instructions[InstructionNumber][x];
+                var choice=instructions[instructionNumber][x];
                var dropdownClass= document.getElementsByClassName('discardOptionsSelect');
                if(dropdownClass){
  
@@ -165,7 +164,7 @@ function ExecuteSet(Instructions,start){
                }
             }
             else if(x=='select_nottrained'){
-                var choice=Instructions[InstructionNumber][x];
+                var choice=instructions[instructionNumber][x];
                var dropdownClass= document.getElementsByClassName('notTrainedOptionsSelect');
                if(dropdownClass){
                    dropdownElement=dropdownClass[1];
@@ -185,44 +184,44 @@ function ExecuteSet(Instructions,start){
         }
         
         if(state==1) break;
-        InstructionNumber++;
+        instructionNumber++;
     }
 }
-function ExecuteClick(Coordinates,state,Number,Instructions){
-    console.log('Executing Click');
+function executeClick(Coordinates,state,Number,Instructions){
+
     if(state==1){
         chrome.runtime.sendMessage({'InstructionN':Number,'Instructions':Instructions});
     }
     document.elementFromPoint(Coordinates[0], Coordinates[1]).click();
 }
-function ExecuteSend(SendSequence,state,Number,Instructions){
-    console.log('Executing Send',SendSequence);
+function executeSend(sendSequence,state,number,instructions){
+    console.log('Executing Send',sendSequence);
     if(state==1){
-        chrome.runtime.sendMessage({'InstructionN':Number,'Instructions':Instructions});
+        chrome.runtime.sendMessage({'InstructionN':number,'Instructions':instructions});
     }
-    var size = SendSequence.length;
+    var size = sendSequence.length;
     var i=0;
     while(i<size){
-        console.log(i,' ',SendSequence[i]);
-        var temp=SendSequence[i].keyCode;
-        var tempKey=SendSequence[i].key;
-        var shift=SendSequence[i].shift;
-        var ctrl=SendSequence[i].ctrl;
-        var type=SendSequence[i].type;
-        PressKey(temp,tempKey,shift,ctrl,type);
+        console.log(i,' ',sendSequence[i]);
+        var temp=sendSequence[i].keyCode;
+        var tempKey=sendSequence[i].key;
+        var shift=sendSequence[i].shift;
+        var ctrl=sendSequence[i].ctrl;
+        var alt=sendSequence[i].alt;
+        pressKey(temp,tempKey,shift,ctrl,alt);
       
  i++;
 }
 }
-$(document).on("keydown", KeydownHandler);
-$(document).on("keyup", KeyupHandler);
+$(document).on("keydown", keydownHandler);
+$(document).on("keyup", keyupHandler);
 
 chrome.runtime.onMessage.addListener(function(response,sender,sendResponse){
       if(response.InstructionN){
-          ExecuteSet(response.Instructions,response.InstructionN);
+          executeSet(response.Instructions,response.InstructionN);
       }
 });
-function executeInstrcut(){
+function executeInstruct(){
    var currentText = document.getElementsByClassName('tableRow focused')[0].children[3].innerText;
    chrome.storage.local.get(currentText,function(data){
              if(data[currentText]){
