@@ -1,15 +1,19 @@
-import { _MAP, _SHIFT_MAP, _getReverseMap, _REVERSE_MAP } from '/keyboard.js';
+import { _MAP, _SHIFT_MAP, _getReverseMap, _REVERSE_MAP } from '/util/keyboard.js';
 _getReverseMap();
+
+
+
+
 $(function () {
-    chrome.storage.local.get('@#', function (data) {
-        if (data['@#']) {
-            var y = data['@#'];
+    chrome.storage.local.get('@@#', function (data) {
+        if (data['@@#']) {
+            var y = data['@@#'];
             document.getElementById("abc").innerHTML = y;
         }
     });
-    chrome.storage.local.get('@$', function (data) {
-        if (data['@$']) {
-            var y = data['@$'];
+    chrome.storage.local.get('@@$', function (data) {
+        if (data['@@$']) {
+            var y = data['@@$'];
             document.getElementById("locale").innerHTML = y;
         }
     });
@@ -84,11 +88,11 @@ function setShortcuts(input) {
 
                     }
                     instructionObject = { 'send': sendsequence };
-                    OutputobjArr.push(instructionObject);
+                   // OutputobjArr.push(instructionObject);
                 } else if (instructionType == 'sleep') {
                     var time = parseInt(currentInstructionArray[1]);
                     instructionObject = { 'sleep': time };
-                    OutputobjArr.push(instructionObject);
+                    //OutputobjArr.push(instructionObject);
                 } else if (instructionType == 'click') {
                     var x = parseInt(currentInstructionArray[1]);
                     var y = parseInt(currentInstructionArray[2]);
@@ -96,19 +100,13 @@ function setShortcuts(input) {
                     value.push(x);
                     value.push(y);
                     instructionObject = { 'click': value };
-                    OutputobjArr.push(instructionObject);
+                    //OutputobjArr.push(instructionObject);
 
-                } else if (instructionType == 'select_goalcategory') {
-                    instructionObject = { 'select_goalcategory': currentInstructionArray[1] };
-                    OutputobjArr.push(instructionObject);
-                } else if (instructionType == 'select_discard') {
-                    instructionObject = { 'select_discard': currentInstructionArray[1] };
-                    OutputobjArr.push(instructionObject);
-                } else if (instructionType == 'select_nottrained') {
-                    instructionObject = { 'select_nottrained': currentInstructionArray[1] };
-                    OutputobjArr.push(instructionObject);
+                } else if (instructionType == 'select_goalcategory'||instructionType == 'select_discard'||instructionType == 'select_nottrained') {
+                    instructionObject = { instructionType: currentInstructionArray[1] };
+                    //OutputobjArr.push(instructionObject);
                 }
-
+                OutputobjArr.push(instructionObject);
             }
             output[OutputKey] = OutputobjArr;
         }
@@ -162,7 +160,7 @@ function refreshCurrentActive(event) {
 
 
     var html = "Current Active : " + event.target.id;
-    chrome.storage.local.set({ "@#": html });
+    chrome.storage.local.set({ "@@#": html });
 }
 
 function refreshCurrentLocale(event) {
@@ -171,7 +169,7 @@ function refreshCurrentLocale(event) {
     console.log(selectedElement, document.getElementById('localelist'), 'abc');
     var html = "Active Locale : " + selectedElement;
     document.getElementById("locale").innerHTML = html;
-    chrome.storage.local.set({ "@$": html });
+    chrome.storage.local.set({ "@@$": html });
     var fname = "/jsons/" + event.target.id + "/" + selectedElement + "/expander.json";
     console.log(fname);
     setStorage(fname, setSnippets);

@@ -1,6 +1,6 @@
 {
 	"ctrl, a": [
-		["Send", "ctrl", "a", "space", "b", "c", "d", "shift"],["Sleep",100],
+		["Send", "ctrl", "a", " ", "b", "c", "d", "shift"],["Sleep",100],
 		["select_goalcategory","Alexa"],
 		["Send","a","b","c","d"]
         ],

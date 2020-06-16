@@ -1,10 +1,11 @@
 {
-	"ctrl, a": [
+	"shift, k": [
 		[
 			"Send",
 			"ctrl",
 			"a",
-			"space",
+			" ",
+			"tab",
 			"b",
 			"c",
 			"d",
