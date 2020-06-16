@@ -4,7 +4,7 @@
     "version": "1.0",
     "description": "Easing out DA processes",
     "browser_action": {
-        "default_icon": "f046-512.png",
+        "default_icon": "/util/f046-512.png",
         "default_popup": "popup.html"
     },
     "background": {
@@ -24,7 +24,7 @@
                 "<all_urls>"
             ],
             "js": [
-                "jquery.js",
+                "/util/jquery.js",
                 "shortcut_content.js",
                 "text_expander.js"
             ],

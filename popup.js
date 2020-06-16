@@ -88,11 +88,11 @@ function setShortcuts(input) {
 
                     }
                     instructionObject = { 'send': sendsequence };
-                   // OutputobjArr.push(instructionObject);
+                   
                 } else if (instructionType == 'sleep') {
                     var time = parseInt(currentInstructionArray[1]);
                     instructionObject = { 'sleep': time };
-                    //OutputobjArr.push(instructionObject);
+                    
                 } else if (instructionType == 'click') {
                     var x = parseInt(currentInstructionArray[1]);
                     var y = parseInt(currentInstructionArray[2]);
@@ -100,11 +100,10 @@ function setShortcuts(input) {
                     value.push(x);
                     value.push(y);
                     instructionObject = { 'click': value };
-                    //OutputobjArr.push(instructionObject);
 
                 } else if (instructionType == 'select_goalcategory'||instructionType == 'select_discard'||instructionType == 'select_nottrained') {
                     instructionObject = { instructionType: currentInstructionArray[1] };
-                    //OutputobjArr.push(instructionObject);
+    
                 }
                 OutputobjArr.push(instructionObject);
             }
