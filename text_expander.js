@@ -14,7 +14,7 @@ function keydown(event){
       clear_buffer();
     }
     else{
-    TIMER=setTimeout(clear_buffer,1500);
+    TIMER=setTimeout(clear_buffer,TIME_OUT);
     var pressedKey = String.fromCharCode(charCode);
 
     text_buffer.push(pressedKey);
@@ -34,7 +34,7 @@ function keyup(event){
         }
         text_buffer.pop();
         
-        TIMER=setTimeout(clear_buffer,3000);
+        TIMER=setTimeout(clear_buffer,TIME_OUT);
     }
 }
 

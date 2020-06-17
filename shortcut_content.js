@@ -18,13 +18,23 @@ function pressKey(keyCode, key, shiftkey, ctrlkey, altkey) {
 
         $.tabNext();
     }
-    // handling presses in text area
+
+
+    
 
     else {
         console.log(currentEventD, currentEventP, currentEventU);
+
+
+        /*
+        * dipatching keydown,keypress and keyup events for 
+        * events listeners to listen for
+        */
         document.activeElement.dispatchEvent(currentEventD);
         document.activeElement.dispatchEvent(currentEventP);
         document.activeElement.dispatchEvent(currentEventU);
+
+          // handling key triggers in text area
         if ((document.activeElement.tagName == 'TEXTAREA' || document.activeElement.tagName == 'INPUT')) {
             var pressedkey = currentEventD.key;
             console.log(pressedkey);
@@ -42,6 +52,7 @@ function createmyKey(eventtype, keyCode, key, shiftkey, ctrlkey, altkey) {
     var keyevent = new KeyboardEvent(eventtype, { "bubbles": true, "keyCode": keyCode, "ctrlKey": ctrlkey, "key": key, "shiftKey": shiftkey, "altKey": altkey });
     return keyevent;
 }
+
 function keydownHandler(event) {
     if (event.cancelable == false) return;
     var pressKey = event.which;
@@ -96,31 +107,23 @@ function executeSet(instructions, start) {
 
         for (x in instructions[instructionNumber]) {
             x = x.toLowerCase();
-            if (x == 'send') {
+            if (x == 'send' || x == 'click') {
 
                 nextInstructionNumber = instructionNumber + 1;
 
                 if (nextInstructionNumber < size) {
                     var nextInstruction = instructions[nextInstructionNumber];
                     var nextInstructionKey = Object.keys(nextInstruction);
-                    if (nextInstructionKey == 'sleep') state = 1;
+                    if (nextInstructionKey == 'sleep') state = 0;
                 }
-                executeSend(instructions[instructionNumber][x], state, instructionNumber, instructions);
+                if (x == 'send')
+                    executeSend(instructions[instructionNumber][x], state, instructionNumber, instructions);
+                else if (x == 'click')
+                    executeClick(instructions[instructionNumber][x], state, instructionNumber, instructions);
                 if (state == 1) break;
             }
             else if (x == 'sleep') {
                 sleep(instructions[instructionNumber][x]);
-            }
-            else if (x == 'click') {
-                nextInstructionNumber = instructionNumber + 1;
-
-                if (nextInstructionNumber < size) {
-                    var nextInstruction = instructions[nextInstructionNumber];
-                    var nextInstructionKey = Object.keys(nextInstruction);
-                    if (nextInstructionKey == 'sleep') state = 1;
-                }
-                executeClick(instructions[instructionNumber][x], state, instructionNumber, instructions);
-                if (state == 1) break;
             }
             else if (x == 'select_goalcategory') {
                 var choice = instructions[instructionNumber][x];
@@ -131,7 +134,7 @@ function executeSet(instructions, start) {
                         var dropdownList = dropdownElement.options;
                         var index = 0;
                         while (index < dropdownList.length && dropdownList[index].value != choice) {
-                            console.log('index', index);
+                            
                             index++;
                         }
                         if (index < dropdownList.length) {
@@ -151,7 +154,7 @@ function executeSet(instructions, start) {
                         var dropdownList = dropdownElement.options;
                         var index = 0;
                         while (index < dropdownList.length && dropdownList[index].value != choice) {
-                            console.log('index', index);
+                            
 
                             index++;
                         }
@@ -193,6 +196,8 @@ function executeClick(Coordinates, state, Number, Instructions) {
     }
     document.elementFromPoint(Coordinates[0], Coordinates[1]).click();
 }
+
+
 function executeSend(sendSequence, state, number, instructions) {
     console.log('Executing Send', sendSequence);
     if (state == 1) {

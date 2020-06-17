@@ -5,6 +5,11 @@ _getReverseMap();
 
 
 $(function () {
+    /*
+    * retreiving and showing
+    * UI data of popup.html as it is refreshed
+    * each time the popup is opened
+    */
     chrome.storage.local.get('@@#', function (data) {
         if (data['@@#']) {
             var y = data['@@#'];
@@ -73,11 +78,8 @@ function setShortcuts(input) {
                             flag = 1;
                             currentchar = temp - 96
                         }
-                        if (temp >= 65 && temp <= 90) flag = 1;
-                        if (temp >= 48 && temp <= 57) flag = 1;
-                        if (temp >= 186 && temp <= 192) flag = 1;
-                        if (temp >= 106 && temp <= 111) flag = 1;
-                        if (temp >= 219 && temp <= 221 || temp == 32) flag = 1;
+                        var charOrNot = (temp >= 65 && temp <= 90) || (temp >= 48 && temp <= 57) || (temp >= 186 && temp <= 192) || (temp >= 106 && temp <= 111) || ((temp >= 219 && temp <= 221) || temp == 32)
+                        if (charOrNot) flag = 1
                         if (flag == 1) {
                             var currentcharobj = { 'key': currentchar, 'keyCode': currentcharKeyCode, 'shift': shift, 'ctrl': ctrl, 'alt': alt };
                         } else {
@@ -88,11 +90,11 @@ function setShortcuts(input) {
 
                     }
                     instructionObject = { 'send': sendsequence };
-                   
+
                 } else if (instructionType == 'sleep') {
                     var time = parseInt(currentInstructionArray[1]);
                     instructionObject = { 'sleep': time };
-                    
+
                 } else if (instructionType == 'click') {
                     var x = parseInt(currentInstructionArray[1]);
                     var y = parseInt(currentInstructionArray[2]);
@@ -101,9 +103,9 @@ function setShortcuts(input) {
                     value.push(y);
                     instructionObject = { 'click': value };
 
-                } else if (instructionType == 'select_goalcategory'||instructionType == 'select_discard'||instructionType == 'select_nottrained') {
+                } else if (instructionType == 'select_goalcategory' || instructionType == 'select_discard' || instructionType == 'select_nottrained') {
                     instructionObject = { instructionType: currentInstructionArray[1] };
-    
+
                 }
                 OutputobjArr.push(instructionObject);
             }
