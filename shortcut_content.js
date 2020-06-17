@@ -25,8 +25,7 @@ function pressKey(keyCode, key, shiftkey, ctrlkey, altkey) {
         document.activeElement.dispatchEvent(currentEventD);
         document.activeElement.dispatchEvent(currentEventP);
         document.activeElement.dispatchEvent(currentEventU);
-        var modifier = currentEventD.ctrlKey || currentEventD.shiftKey || currentEventD.altKey;
-        if ((modifier == 0) && (document.activeElement.tagName == 'TEXTAREA' || document.activeElement.tagName == 'INPUT')) {
+        if ((document.activeElement.tagName == 'TEXTAREA' || document.activeElement.tagName == 'INPUT')) {
             var pressedkey = currentEventD.key;
             console.log(pressedkey);
             var box = document.activeElement;
