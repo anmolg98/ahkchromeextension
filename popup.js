@@ -37,6 +37,11 @@ function refreshWorkFlow(event) {
 }
 var ArrayofKeys = [];
 var text = [];
+
+
+/* stores shortcuts in the
+* required format from the passed json
+*/
 function setShortcuts(input) {
     var output = {};
     for (var key in input) {
@@ -78,6 +83,10 @@ function setShortcuts(input) {
                             flag = 1;
                             currentchar = temp - 96
                         }
+                        /*
+                        * keypresses which are typable characters
+                        * are flagged 
+                        */
                         var charOrNot = (temp >= 65 && temp <= 90) || (temp >= 48 && temp <= 57) || (temp >= 186 && temp <= 192) || (temp >= 106 && temp <= 111) || ((temp >= 219 && temp <= 221) || temp == 32)
                         if (charOrNot) flag = 1
                         if (flag == 1) {
@@ -127,7 +136,10 @@ function setShortcuts(input) {
     console.log(input, output);
     chrome.storage.local.set(output);
 }
-
+/* stores snippets in the
+* required format(with an added prefix @ on each key) f
+* from the passed json
+*/
 function setSnippets(input) {
     for (var key in input) {
         var prefixedSnippet = '@' + key;
@@ -136,7 +148,10 @@ function setSnippets(input) {
         chrome.storage.local.set(obj);
     }
 }
-
+/* sends request for passed json file
+* and calls back to store the same in 
+* appropriate form
+*/
 function setStorage(filename, type) {
     var xhr = new XMLHttpRequest();
     xhr.onreadystatechange = function () {
@@ -163,7 +178,10 @@ function refreshCurrentActive(event) {
     var html = "Current Active : " + event.target.id;
     chrome.storage.local.set({ "@@#": html });
 }
-
+/* retreives appropriate files to be
+*  populated in the local storage, called
+* on workflow or locale change by the user
+*/
 function refreshCurrentLocale(event) {
     var index = document.getElementById("localelist").selectedIndex;
     var selectedElement = document.getElementById("localelist").options[index].innerHTML;
